@@ -104,13 +104,16 @@ class SemiDeepGenerativeModel(object):
         # Get test results
         self.vae_results['test_auc'] = self.vae_trainer.test_auc
         self.vae_results['test_time'] = self.vae_trainer.test_time
-
-    def save_model(self, export_model):
+        
+    def save_model(self, export_model,save_ae = True):
         """Save a Semi-Supervised Deep Generative model to export_model."""
 
         net_dict = self.net.state_dict()
         torch.save({'net_dict': net_dict}, export_model)
+        ae_net_dict = self.net.state_dict() if save_ae else None
 
+        torch.save({'net_dict': net_dict,
+                    'vae_net_dict': ae_net_dict}, export_model)
     def load_model(self, model_path):
         """Load a Semi-Supervised Deep Generative model from model_path."""
 

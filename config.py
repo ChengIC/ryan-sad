@@ -67,10 +67,13 @@ pretrain_params = {
 }
 
 train_params = {
+    'n_epochs':3,
     'dataset':Custom,
 }
+
 ae_net_name = ''
 
-net_name    = 'custom_net'
+net_name    = 'cifar10_LeNet'
 
-save_path   = None
+save_path   = "./test.pth"
+
