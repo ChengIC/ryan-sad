@@ -38,7 +38,7 @@ class IsoForest(object):
 
     def train(self, dataset: BaseADDataset, device: str = 'cpu', n_jobs_dataloader: int = 0):
         """Trains the Isolation Forest model on the training data."""
-        
+        f = open('./log/isoforest.txt','w')
         # do not drop last batch for non-SGD optimization shallow_ssad
         train_loader = DataLoader(dataset=dataset.train_set, batch_size=128, shuffle=True,
                                   num_workers=n_jobs_dataloader, drop_last=False)
@@ -56,6 +56,7 @@ class IsoForest(object):
 
         # Training
         print('Starting training...')
+        print('Starting training...',file = f)
         start_time = time.time()
         self.model.fit(X)
         train_time = time.time() - start_time
@@ -63,6 +64,8 @@ class IsoForest(object):
 
         print('Training Time: {:.3f}s'.format(self.results['train_time']))
         print('Finished training.')
+        print('Training Time: {:.3f}s'.format(self.results['train_time']),file = f)
+        print('Finished training.',file = f)
 
     def test(self, dataset: BaseADDataset, device: str = 'cpu', n_jobs_dataloader: int = 0):
         """Tests the Isolation Forest model on the test data."""
@@ -107,7 +110,10 @@ class IsoForest(object):
         print('Test AUC: {:.2f}%'.format(100. * self.results['test_auc']))
         print('Test Time: {:.3f}s'.format(self.results['test_time']))
         print('Finished testing.')
-
+        
+        print('Test AUC: {:.2f}%'.format(100. * self.results['test_auc']))
+        print('Test Time: {:.3f}s'.format(self.results['test_time']))
+        print('Finished testing.')
 
 
     def save_model(self, export_path):

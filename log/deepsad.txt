@@ -1,0 +1,8 @@
+Initializing center c...
+Center c initialized.
+Starting training...
+| Epoch: 001/003 | Train Time: 2.927s | Train Loss: 90.187738 |
+| Epoch: 002/003 | Train Time: 2.654s | Train Loss: 41.694304 |
+| Epoch: 003/003 | Train Time: 2.667s | Train Loss: 12.607426 |
+Training Time: 8.249s
+Finished training.

@@ -43,7 +43,7 @@ class KDE(object):
         # do not drop last batch for non-SGD optimization shallow_ssad
         train_loader = DataLoader(dataset=dataset.train_set, batch_size=128, shuffle=True,
                                   num_workers=n_jobs_dataloader, drop_last=False)
-
+        f = open('./log/kde.txt')
         # Get data from loader
         X = ()
         for data in train_loader:
@@ -57,16 +57,19 @@ class KDE(object):
 
         # Training
         print('Starting training...')
+        print('Starting training...',file = f)
         start_time = time.time()
 
         if bandwidth_GridSearchCV:
             # use grid search cross-validation to select bandwidth
             print('Using GridSearchCV for bandwidth selection...')
+            print('Using GridSearchCV for bandwidth selection...',file =f)
             params = {'bandwidth': np.logspace(0.5, 5, num=10, base=2)}
             hyper_kde = GridSearchCV(KernelDensity(kernel=self.kernel), params, n_jobs=self.n_jobs, cv=5, verbose=0)
             hyper_kde.fit(X)
             self.bandwidth = hyper_kde.best_estimator_.bandwidth
             print('Best bandwidth: {:.8f}'.format(self.bandwidth))
+            print('Best bandwidth: {:.8f}'.format(self.bandwidth),file =f)
             self.model = hyper_kde.best_estimator_
         else:
             # if exponential kernel, re-initialize kde with bandwidth minimizing the numerical error
@@ -81,10 +84,13 @@ class KDE(object):
 
         print('Training Time: {:.3f}s'.format(self.results['train_time']))
         print('Finished training.')
+        
+        print('Training Time: {:.3f}s'.format(self.results['train_time']),file = f)
+        print('Finished training.',file = f)
 
     def test(self, dataset: BaseADDataset, device: str = 'cpu', n_jobs_dataloader: int = 0):
         """Tests the Kernel Density Estimation model on the test data."""
-        logger = logging.getLogger()
+        f = open('test_kde.txt','w')
 
         _, test_loader = dataset.loaders(batch_size=128, num_workers=n_jobs_dataloader)
 
@@ -106,6 +112,7 @@ class KDE(object):
 
         # Testing
         print('Starting testing...')
+        print('Starting testing...',file = f)
         start_time = time.time()
         scores = (-1.0) * self.model.score_samples(X)
         self.results['test_time'] = time.time() - start_time
@@ -125,6 +132,9 @@ class KDE(object):
         print('Test AUC: {:.2f}%'.format(100. * self.results['test_auc']))
         print('Test Time: {:.3f}s'.format(self.results['test_time']))
         print('Finished testing.')
+        print('Test AUC: {:.2f}%'.format(100. * self.results['test_auc']),file = f)
+        print('Test Time: {:.3f}s'.format(self.results['test_time']),file =f)
+        print('Finished testing.',file = f)
 
 
     def save_model(self, export_path):

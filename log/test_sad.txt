@@ -1,0 +1,5 @@
+Starting testing...
+Test Loss: 18.552880
+Test AUC: 73.53%
+Test Time: 2.865s
+Finished testing.

@@ -70,7 +70,7 @@ train_params = {
     'n_epochs':3,
     'dataset':Custom,
 }
-
+test_dataset = Custom #default None
 ae_net_name = ''
 
 net_name    = 'cifar10_LeNet'

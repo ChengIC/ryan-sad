@@ -25,7 +25,7 @@ class DeepSADTrainer(BaseTrainer):
 
         # Optimization parameters
         self.eps = 1e-6
-
+        self.f   = open('./log/deepsad.txt','w')
         # Results
         self.train_time = None
         self.test_auc = None
@@ -34,7 +34,7 @@ class DeepSADTrainer(BaseTrainer):
 
     def train(self, dataset: BaseADDataset, net: BaseNet):
         
-
+        
         # Get train data loader
         train_loader, _ = dataset.loaders(batch_size=self.batch_size, num_workers=self.n_jobs_dataloader)
 
@@ -50,11 +50,14 @@ class DeepSADTrainer(BaseTrainer):
         # Initialize hypersphere center c (if c not loaded)
         if self.c is None:
             print('Initializing center c...')
+            print('Initializing center c...',file = self.f)
             self.c = self.init_center_c(train_loader, net)
             print('Center c initialized.')
+            print('Center c initialized.',file = self.f)
 
         # Training
         print('Starting training...')
+        print('Starting training...',file = self.f)
         start_time = time.time()
         net.train()
         for epoch in range(self.n_epochs):
@@ -62,6 +65,7 @@ class DeepSADTrainer(BaseTrainer):
             
             if epoch in self.lr_milestones:
                 print('  LR scheduler: new learning rate is %g' % float(scheduler.get_lr()[0]))
+                print('  LR scheduler: new learning rate is %g' % float(scheduler.get_lr()[0]),file=self.f)
 
             epoch_loss = 0.0
             n_batches = 0
@@ -88,17 +92,21 @@ class DeepSADTrainer(BaseTrainer):
             epoch_train_time = time.time() - epoch_start_time
             print(f'| Epoch: {epoch + 1:03}/{self.n_epochs:03} | Train Time: {epoch_train_time:.3f}s '
                         f'| Train Loss: {epoch_loss / n_batches:.6f} |')
+            print(f'| Epoch: {epoch + 1:03}/{self.n_epochs:03} | Train Time: {epoch_train_time:.3f}s '
+                        f'| Train Loss: {epoch_loss / n_batches:.6f} |',file = self.f)
             scheduler.step()
 
         self.train_time = time.time() - start_time
         print('Training Time: {:.3f}s'.format(self.train_time))
         print('Finished training.')
-
+        print('Training Time: {:.3f}s'.format(self.train_time),file = self.f)
+        print('Finished training.',file = self.f)
+        self.f.close()
         return net
 
     def test(self, dataset: BaseADDataset, net: BaseNet):
-        logger =logging.basicConfig(level = logging.INFO)
-
+        
+        f = open('./log/test_sad.txt','w')
         # Get test data loader
         _, test_loader = dataset.loaders(batch_size=self.batch_size, num_workers=self.n_jobs_dataloader)
 
@@ -107,6 +115,7 @@ class DeepSADTrainer(BaseTrainer):
 
         # Testing
         print('Starting testing...')
+        print('Starting testing...',file = f)
         epoch_loss = 0.0
         n_batches = 0
         start_time = time.time()
@@ -149,6 +158,10 @@ class DeepSADTrainer(BaseTrainer):
         print('Test AUC: {:.2f}%'.format(100. * self.test_auc))
         print('Test Time: {:.3f}s'.format(self.test_time))
         print('Finished testing.')
+        print('Test Loss: {:.6f}'.format(epoch_loss / n_batches),file  = f)
+        print('Test AUC: {:.2f}%'.format(100. * self.test_auc),file = f)
+        print('Test Time: {:.3f}s'.format(self.test_time),file = f)
+        print('Finished testing.',file = f)
 
     def init_center_c(self, train_loader: DataLoader, net: BaseNet, eps=0.1):
         """Initialize hypersphere center c as the mean from an initial forward pass on the data."""

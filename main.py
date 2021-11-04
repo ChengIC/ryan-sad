@@ -50,5 +50,7 @@ if not(task in NotNetwork):
     Task.set_network(net_name)
     
 Task.train(**train_params)
+if test_dataset!=None:
+    Task.test(test_dataset)
 
 Task.save_model(save_path,save_ae)

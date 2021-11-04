@@ -39,7 +39,7 @@ class OCSVM(object):
 
     def train(self, dataset: BaseADDataset, device: str = 'cpu', n_jobs_dataloader: int = 0):
         """Trains the OC-SVM model on the training data."""
-        logger = logging.getLogger()
+        f = open('./log/ocsvm.txt','w')
 
         # do not drop last batch for non-SGD optimization shallow_ssad
         train_loader = DataLoader(dataset=dataset.train_set, batch_size=128, shuffle=True,
@@ -58,7 +58,7 @@ class OCSVM(object):
 
         # Training
         print('Starting training...')
-
+        print('Starting training...',file = f)
         # Select model via hold-out test set of 1000 samples
         gammas = np.logspace(-7, 2, num=10, base=2)
         best_auc = 0.0
@@ -105,7 +105,8 @@ class OCSVM(object):
 
             print(f'  | Model {i:02}/{len(gammas):02} | Gamma: {gamma:.8f} | Train Time: {train_time:.3f}s '
                         f'| Val AUC: {100. * auc:.2f} |')
-
+            print(f'  | Model {i:02}/{len(gammas):02} | Gamma: {gamma:.8f} | Train Time: {train_time:.3f}s '
+                        f'| Val AUC: {100. * auc:.2f} |',file = f)
             if auc > best_auc:
                 best_auc = auc
                 self.model = model
@@ -125,11 +126,14 @@ class OCSVM(object):
         print(f'Best Model: | Gamma: {self.gamma:.8f} | AUC: {100. * best_auc:.2f}')
         print('Training Time: {:.3f}s'.format(self.results['train_time']))
         print('Finished training.')
+        print(f'Best Model: | Gamma: {self.gamma:.8f} | AUC: {100. * best_auc:.2f}',file = f)
+        print('Training Time: {:.3f}s'.format(self.results['train_time']),file = f)
+        print('Finished training.',file = f)
 
     def test(self, dataset: BaseADDataset, device: str = 'cpu', n_jobs_dataloader: int = 0):
         """Tests the OC-SVM model on the test data."""
         logger = logging.getLogger()
-
+        f = open('test_ocsvm.txt','w')
         _, test_loader = dataset.loaders(batch_size=128, num_workers=n_jobs_dataloader)
 
         # Get data from loader
@@ -150,6 +154,7 @@ class OCSVM(object):
 
         # Testing
         print('Starting testing...')
+        print('Starting testing...',file = f)
         start_time = time.time()
 
         scores = (-1.0) * self.model.decision_function(X)
@@ -177,11 +182,17 @@ class OCSVM(object):
             self.results['test_auc_linear'] = roc_auc_score(labels, scores_linear)
             print('Test AUC linear model: {:.2f}%'.format(100. * self.results['test_auc_linear']))
             print('Test Time linear model: {:.3f}s'.format(self.results['test_time_linear']))
+            print('Test AUC linear model: {:.2f}%'.format(100. * self.results['test_auc_linear']),file = f)
+            print('Test Time linear model: {:.3f}s'.format(self.results['test_time_linear']),file =f)
 
         # Log results
         print('Test AUC: {:.2f}%'.format(100. * self.results['test_auc']))
         print('Test Time: {:.3f}s'.format(self.results['test_time']))
         print('Finished testing.')
+        
+        print('Test AUC: {:.2f}%'.format(100. * self.results['test_auc']),file = f)
+        print('Test Time: {:.3f}s'.format(self.results['test_time']),file = f)
+        print('Finished testing.',file = f)
 
 
     def save_model(self, export_path):
