@@ -1,5 +1,6 @@
 
 ### Custom Dataset and network 
+```py
 
 class custom_dataset(Dataset):
     def __init__(self):
@@ -9,13 +10,16 @@ class custom_dataset(Dataset):
         pass
     def __len__(self):
         pass
+```
 
+### Custom network 
+```py
 
 Custom = CustomDataset(
     train_dataset(transform=transform),
     test_dataset(transform=transform)
 )
-
+```
 
 ### Custom NetWork
 
@@ -23,5 +27,5 @@ Example is in `./network/custom.py`
 
 ### Config Parameters
 
-Example is in config.py
+Example is in `config.py`
 
