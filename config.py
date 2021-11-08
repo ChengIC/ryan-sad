@@ -20,10 +20,10 @@ class dataset(Dataset):
         self.root_path = './Data'
         self.transform = transform
         self.data = list(map(
-            lambda x : (os.path.join(self.root_path + "/normal",x),1),
+            lambda x : (os.path.join(self.root_path + "/normal",x),0),
             os.listdir(os.path.join(self.root_path,'normal'))
             )) + list(map(
-            lambda x : (os.path.join(self.root_path + "/abnormal",x),0),
+            lambda x : (os.path.join(self.root_path + "/abnormal",x),1),
             os.listdir(os.path.join(self.root_path,'abnormal'))
         ))
     def __getitem__(self,index):
